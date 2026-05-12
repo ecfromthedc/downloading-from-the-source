@@ -88,10 +88,17 @@ cat > "$PIPELINE_PLIST" <<EOF
 <plist version="1.0">
 <dict>
     <key>Label</key><string>${PIPELINE_LABEL}</string>
+    <!--
+      Default scope for launchd-triggered fires: only act on memos
+      recorded in the last 7 days. Keeps the watcher cheap. Backfills
+      of older history must be invoked manually with --backfill --since N.
+    -->
     <key>ProgramArguments</key>
     <array>
         <string>${REAL_PY}</string>
         <string>${PIPELINE}</string>
+        <string>--since</string>
+        <string>7</string>
     </array>
     <key>WatchPaths</key>
     <array>

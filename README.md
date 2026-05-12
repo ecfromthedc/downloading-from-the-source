@@ -187,6 +187,7 @@ launchctl bootout gui/$(id -u)/com.risingtides.voice-memos-keepalive
 
 ## Tuning
 
+- **Default scope of the launchd watcher** — `--since 7` (last week only). The watcher is intentionally narrow so a CloudKit re-shuffle of the Recordings directory doesn't trigger transcription of every historical memo. Backfills of older history are explicit: `voice-memo-pipeline.py --backfill --since 90`. Edit the `--since` value in the plist (or in `install.sh`) if you want a wider default.
 - **Whisper model** — defaults to `small` (good balance, ~2-5x realtime on Apple Silicon). Use `--model medium` or `--model large` for tougher audio, `--model tiny` for speed.
 - **`QUIESCENCE_SECONDS`** in the script (default 8) — how long a file must be untouched before the pipeline considers it "done writing". Bump if you see partial transcripts.
 - **`ThrottleInterval`** in the watcher plist (default 30s) — how long launchd waits before re-firing on rapid filesystem events.
