@@ -70,6 +70,10 @@ INTAKE_SCRIPT = Path(
         str(HOME / "Projects" / "active" / "rt-agents" / "alexandria-audio-intake.py"),
     )
 )
+CLASSIFIER_SCRIPT = Path(__file__).parent / "classify-alexandria-entry.py"
+TRANSCRIPTS_DIR = (
+    HOME / "Documents" / "Obsidian Vault" / "Alexandria" / "Inspiration Queue" / "To Process"
+)
 NEO4J_SCRIPT = HOME / "Projects" / "active" / "rt-agents" / "neo4j-alexandria.py"
 NEO4J_VENV_PYTHON = HOME / "Projects" / "active" / "rt-agents" / ".venv" / "bin" / "python3"
 
@@ -399,10 +403,39 @@ def main() -> int:
             log.warning("Nothing successfully staged.")
             return 1
 
+        # Snapshot transcript dir so we can identify which .md files the intake
+        # writes, and classify each one by Eric's context (rising-tides / mon-rovia / personal).
+        pre_intake_md: set[str] = (
+            {p.name for p in TRANSCRIPTS_DIR.iterdir() if p.suffix == ".md"}
+            if TRANSCRIPTS_DIR.exists()
+            else set()
+        )
+
         rc = run_intake([t for _, t in staged], model=args.model)
         if rc != 0:
             log.error("Intake exited %s — leaving state untouched so files retry next run", rc)
             return rc
+
+        # Classify every newly-written transcript.
+        if CLASSIFIER_SCRIPT.exists() and TRANSCRIPTS_DIR.exists():
+            new_mds = [
+                TRANSCRIPTS_DIR / name
+                for name in (n for n in (p.name for p in TRANSCRIPTS_DIR.iterdir() if p.suffix == ".md") if n not in pre_intake_md)
+            ]
+            for md in new_mds:
+                log.info("Classifying %s", md.name)
+                cls = subprocess.run(
+                    [sys.executable, str(CLASSIFIER_SCRIPT), str(md)],
+                    capture_output=True,
+                    text=True,
+                    timeout=120,
+                )
+                for line in cls.stdout.splitlines():
+                    log.info("  classify | %s", line.rstrip())
+                for line in cls.stderr.splitlines():
+                    log.warning("  classify! | %s", line.rstrip())
+        else:
+            log.info("Classifier not available — skipping context tagging")
 
         for memo, target in staged:
             state[memo.uuid] = {

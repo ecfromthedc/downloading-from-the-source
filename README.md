@@ -94,6 +94,28 @@ The installer:
 
 ---
 
+## Context classification (optional but recommended)
+
+If you want each transcript auto-tagged with which life-context it belongs to
+— so downstream tools (team-shared repos, Slack channels) can silently skip
+the entries that should stay private — drop `classify-alexandria-entry.py`
+next to the pipeline and the pipeline will run it automatically on every new
+transcript.
+
+The classifier uses local [Ollama](https://ollama.com) (default `llama3.1:8b`)
+to assign `context: rising-tides | mon-rovia | personal` to each entry, plus
+`team_share: true|false`. Only `rising-tides` is team-shared by default —
+everything else is treated as private to you.
+
+Downstream tools (e.g., `alexandria-team-publisher.py`,
+`alexandria-slack-notifier.py`) check the `context:` and `team_share:` flags
+and silently no-op for non-RT entries. No "skipped" notification leaks the
+existence of personal content into shared channels.
+
+You can edit the categories and rules in `classify-alexandria-entry.py` to
+match your own contexts. The shipped version is tuned for the original RT
+use case (agency / artist project / personal).
+
 ## Configure
 
 By default the pipeline calls the [Library of Alexandria audio intake script](https://github.com/ecfromthedc) at `~/Projects/active/rt-agents/alexandria-audio-intake.py`. That script does the actual Whisper transcribe, generates a templated markdown entry, and trashes the staged `.m4a` copy.
