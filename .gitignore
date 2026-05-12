@@ -1,0 +1,26 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+.venv/
+venv/
+
+# Logs (script writes these; don't ship)
+*.log
+*.log.*
+
+# Local state
+.voice-memo-pipeline.state.json
+
+# macOS
+.DS_Store
+._*
+
+# Editor
+.vscode/
+.idea/
+*.swp
+
+# Local installer scratch
+.install-scratch/

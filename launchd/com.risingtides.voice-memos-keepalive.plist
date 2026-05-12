@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.risingtides.voice-memos-keepalive</string>
+
+    <!--
+      Wakes Voice Memos.app every 20 min so its CloudKit subscription
+      stays active and new iPhone recordings sync down to this Mac.
+      Opens hidden (-j) and in the background (-g) so it never steals
+      focus or shows windows.
+    -->
+    <key>ProgramArguments</key>
+    <array>
+        <string>/usr/bin/open</string>
+        <string>-gja</string>
+        <string>/System/Applications/VoiceMemos.app</string>
+    </array>
+
+    <key>StartInterval</key>
+    <integer>1200</integer>
+
+    <key>RunAtLoad</key>
+    <true/>
+
+    <key>StandardOutPath</key>
+    <string>/Users/ericcromartie/Library/Logs/voice-memos-keepalive.log</string>
+    <key>StandardErrorPath</key>
+    <string>/Users/ericcromartie/Library/Logs/voice-memos-keepalive.log</string>
+
+    <key>LimitLoadToSessionType</key>
+    <string>Aqua</string>
+</dict>
+</plist>
