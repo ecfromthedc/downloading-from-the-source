@@ -6,6 +6,15 @@
     <string>com.risingtides.voice-memos-keepalive</string>
 
     <!--
+      TEMPLATE — install.sh regenerates this file with your real $HOME.
+      Edit install.sh to change defaults; don't edit this file by hand
+      (your edits will be overwritten on next install).
+
+      Placeholders substituted by install.sh:
+        __HOME__  → your $HOME (e.g. /Users/yourname)
+    -->
+
+    <!--
       Wakes Voice Memos.app every 20 min so its CloudKit subscription
       stays active and new iPhone recordings sync down to this Mac.
       Opens hidden (-j) and in the background (-g) so it never steals
@@ -25,9 +34,9 @@
     <true/>
 
     <key>StandardOutPath</key>
-    <string>/Users/ericcromartie/Library/Logs/voice-memos-keepalive.log</string>
+    <string>__HOME__/Library/Logs/voice-memos-keepalive.log</string>
     <key>StandardErrorPath</key>
-    <string>/Users/ericcromartie/Library/Logs/voice-memos-keepalive.log</string>
+    <string>__HOME__/Library/Logs/voice-memos-keepalive.log</string>
 
     <key>LimitLoadToSessionType</key>
     <string>Aqua</string>

@@ -6,21 +6,34 @@
     <string>com.risingtides.voice-memo-pipeline</string>
 
     <!--
-      Invokes the REAL Python binary (not the /usr/bin/python3 stub
-      that re-execs through xcode-select). macOS TCC matches against
-      the real exec path, so FDA must be granted to this same path.
+      TEMPLATE — install.sh regenerates this file with your real $HOME and the
+      real Python binary path. Edit install.sh to change defaults; don't edit
+      this file by hand (your edits will be overwritten on next install).
+
+      Placeholders substituted by install.sh:
+        __HOME__      → your $HOME (e.g. /Users/yourname)
+        __REAL_PY__   → the real python3 binary resolved at install time
+                        (e.g. /Library/Developer/CommandLineTools/usr/bin/python3)
+        __REPO_DIR__  → absolute path to this repo checkout
+    -->
+
+    <!--
+      Invokes the REAL Python binary (not the /usr/bin/python3 stub that
+      re-execs through xcode-select). macOS TCC matches against the real exec
+      path, so FDA must be granted to this same path. install.sh resolves and
+      substitutes __REAL_PY__ automatically.
     -->
     <!--
-      Default scope for launchd-triggered fires: only consider memos
-      recorded in the last 7 days. Keeps the watcher cheap and prevents
-      it from accidentally grinding the historical backlog when CloudKit
-      shuffles the Recordings directory. To backfill older history, run
-      the pipeline manually with explicit --backfill --since N.
+      Default scope for launchd-triggered fires: only consider memos recorded
+      in the last 7 days. Keeps the watcher cheap and prevents it from
+      accidentally grinding the historical backlog when CloudKit shuffles the
+      Recordings directory. To backfill older history, run the pipeline
+      manually with explicit --backfill --since N.
     -->
     <key>ProgramArguments</key>
     <array>
-        <string>/Library/Developer/CommandLineTools/usr/bin/python3</string>
-        <string>/Users/ericcromartie/Projects/active/rt-agents/voice-memo-pipeline/voice-memo-pipeline.py</string>
+        <string>__REAL_PY__</string>
+        <string>__REPO_DIR__/voice-memo-pipeline.py</string>
         <string>--since</string>
         <string>7</string>
     </array>
@@ -28,7 +41,7 @@
     <!-- Fire whenever the Voice Memos CloudKit container changes. -->
     <key>WatchPaths</key>
     <array>
-        <string>/Users/ericcromartie/Library/Group Containers/group.com.apple.VoiceMemos.shared/Recordings</string>
+        <string>__HOME__/Library/Group Containers/group.com.apple.VoiceMemos.shared/Recordings</string>
     </array>
 
     <!-- Coalesce rapid filesystem events: don't refire within 30s of the last run. -->
@@ -43,15 +56,15 @@
     <false/>
 
     <key>StandardOutPath</key>
-    <string>/Users/ericcromartie/Library/Logs/voice-memo-pipeline.launchd.log</string>
+    <string>__HOME__/Library/Logs/voice-memo-pipeline.launchd.log</string>
 
     <key>StandardErrorPath</key>
-    <string>/Users/ericcromartie/Library/Logs/voice-memo-pipeline.launchd.log</string>
+    <string>__HOME__/Library/Logs/voice-memo-pipeline.launchd.log</string>
 
     <key>EnvironmentVariables</key>
     <dict>
         <key>PATH</key>
-        <string>/Users/ericcromartie/.local/bin:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin</string>
+        <string>__HOME__/.local/bin:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin</string>
         <key>LANG</key>
         <string>en_US.UTF-8</string>
     </dict>
