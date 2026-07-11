@@ -15,7 +15,7 @@ unless --force is passed.
 Usage:
     classify-alexandria-entry.py <path/to/entry.md>
     classify-alexandria-entry.py --force <path/to/entry.md>
-    classify-alexandria-entry.py --model gemma4 <path/to/entry.md>
+    classify-alexandria-entry.py --model gemma3 <path/to/entry.md>
     classify-alexandria-entry.py --dry-run <path/to/entry.md>
 
 Requires:

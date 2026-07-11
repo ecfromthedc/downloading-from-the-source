@@ -132,7 +132,28 @@ Or edit `INTAKE_SCRIPT` near the top of `voice-memo-pipeline.py`. The pipeline c
 $INTAKE_SCRIPT --model <whisper-model> <audio-file-1> <audio-file-2> ...
 ```
 
-A minimal substitute is ~50 lines of Python — see `examples/minimal-intake.py` for a barebones version that just runs Whisper and writes a `.md` file beside each `.m4a`.
+### Recommended: route into ocean-knowledge-intake
+
+`examples/intake-to-ocean.py` is the **canonical consolidation path** for users running [ocean-knowledge-intake](https://github.com/ecfromthedc/ocean-knowledge-intake). It transcribes with `whisper` and files each memo directly into the Ocean read-replica via the `voice_memo` adapter — no intermediate markdown file needed.
+
+```bash
+# One-time setup:
+export VOICE_MEMO_INTAKE_SCRIPT=/path/to/downloading-from-the-source/examples/intake-to-ocean.py
+export OCEAN_INTAKE_DIR=/path/to/ocean-knowledge-intake
+
+# Optional overrides:
+export OCEAN_ACTOR=eric          # actor written into every envelope (default: eric)
+export OCEAN_SCOPE=team          # access_scope: team | finance | leadership | private
+
+# Test without Whisper or Ollama:
+INTAKE_DRY_RUN=1 python3 examples/intake-to-ocean.py --model small /tmp/fake.m4a
+```
+
+`INTAKE_DRY_RUN=1` stubs transcription with a fixture string and prints the envelope JSON instead of writing to the store — useful for CI and local testing.
+
+### Minimal fallback
+
+A barebones substitute is ~50 lines — see `examples/minimal-intake.py` for a version that just runs Whisper and writes a `.md` file beside each `.m4a`.
 
 ---
 
@@ -170,9 +191,11 @@ launchctl bootout gui/$(id -u)/com.risingtides.voice-memos-keepalive
 |------|------|
 | `voice-memo-pipeline.py` | The pipeline. Discovery, staging, intake handoff, state tracking. |
 | `install.sh` | Portable installer — handles FDA walkthrough, plist generation, agent loading. |
-| `launchd/com.risingtides.voice-memo-pipeline.plist` | Reference plist for the watcher. `install.sh` regenerates this for your `$HOME`. |
-| `launchd/com.risingtides.voice-memos-keepalive.plist` | Reference plist for the 20-min Voice Memos waker. |
-| `examples/minimal-intake.py` | Barebones intake script if you don't want to use the RT/Alexandria one. |
+| `launchd/com.risingtides.voice-memo-pipeline.plist` | Generic template plist (placeholders: `__HOME__`, `__REAL_PY__`, `__REPO_DIR__`). `install.sh` regenerates a concrete copy for your `$HOME` at install time. |
+| `launchd/com.risingtides.voice-memos-keepalive.plist` | Generic template plist for the 20-min Voice Memos waker. |
+| `examples/intake-to-ocean.py` | **Recommended intake bridge.** Transcribes via `whisper` and files into ocean-knowledge-intake's `voice_memo` adapter. Set `OCEAN_INTAKE_DIR` to your checkout. Supports `INTAKE_DRY_RUN=1` for testing without dependencies. |
+| `examples/minimal-intake.py` | Barebones fallback — runs Whisper and writes a `.md` file beside each `.m4a`. No Ocean dependency. |
+| `tests/test_pipeline.py` | Unit tests for pure logic (Cocoa epoch conversion, slugify, frontmatter merge, DB title lookup). Run with `python3 -m unittest discover -s tests`. |
 
 ---
 
