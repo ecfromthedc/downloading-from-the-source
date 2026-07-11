@@ -1,0 +1,29 @@
+# rt-fleet manifest — see ecfromthedc/rt-fleet for the contract.
+# Wire heartbeats via `rt-fleet wrap`:
+#   rt-fleet wrap <heartbeat_key> -- <entrypoint>
+
+[[agents]]
+name = "voice-memos-keepalive"
+description = "Nudges Voice Memos.app open every 20 min to keep CloudKit sync active"
+entrypoint = "/usr/bin/open -gja /System/Applications/VoiceMemos.app"
+# Has StartInterval 1200s but this is /usr/bin/open nudging an app — not a
+# data pipeline. It does not call rt-fleet beat and has no meaningful output
+# to monitor. No expected_cadence declared intentionally.
+interval_seconds = 1200
+owner_repo = "ecfromthedc/downloading-from-the-source"
+deploy_target = "launchd"
+covers = ["com.risingtides.voice-memos-keepalive"]
+
+[[agents]]
+name = "voice-memo-pipeline"
+description = "Transcribes and processes new iPhone Voice Memo recordings (event-driven via WatchPaths)"
+entrypoint = "rt-fleet wrap voice-memo-pipeline -- python3 voice-memo-pipeline.py --since 7"
+# Triggered by WatchPaths on the VoiceMemos CloudKit Recordings directory —
+# fires on filesystem events, not a clock. No expected_cadence: event-driven.
+owner_repo = "ecfromthedc/downloading-from-the-source"
+deploy_target = "launchd"
+covers = ["com.risingtides.voice-memo-pipeline"]
+
+[agents.health]
+heartbeat_key = "voice-memo-pipeline"
+# No expected_cadence — event-driven via WatchPaths, not a periodic job.
