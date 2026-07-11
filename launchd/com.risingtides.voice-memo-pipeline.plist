@@ -28,7 +28,7 @@
       in the last 7 days. Keeps the watcher cheap and prevents it from
       accidentally grinding the historical backlog when CloudKit shuffles the
       Recordings directory. To backfill older history, run the pipeline
-      manually with explicit --backfill --since N.
+      manually with explicit "backfill/since N" flags.
     -->
     <key>ProgramArguments</key>
     <array>
